@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="google-site-verification" content="adD3k16zsGwXAcbV4_gVbC3DwenW829yQoBpDa76fJw" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroCalc.xyz | Ultimate Maker Toolkit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1016;
+            --glass: rgba(30, 30, 40, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --primary: #00f2fe;
+            --accent: #4facfe;
+            --text: #ffffff;
+            --text-gray: #9ca3af;
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --success: #00ff9d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 40%);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- Sidebar --- */
+        aside {
+            width: 300px;
+            background: rgba(15, 16, 22, 0.8);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(15px);
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 2rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #4facfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        .menu button {
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 4px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu button:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .menu button.active {
+            background: linear-gradient(90deg, rgba(0,242,254,0.1), transparent);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Footer in Sidebar (Donate + Ukraine) */
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .donate-btn {
+            display: block;
+            background: linear-gradient(135deg, #FF9D6C, #BB4E75);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(187, 78, 117, 0.2);
+        }
+        .donate-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(187, 78, 117, 0.4); }
+
+        .ukraine-badge {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        .ukraine-badge a {
+            color: var(--primary);
+            text-decoration: none;
+            display: block;
+            margin-top: 5px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .ukraine-badge a:hover { text-decoration: underline; color: #fff; }
+
+        /* --- Main Content --- */
+        main {
+            flex: 1;
+            padding: 2rem 4rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Ad Banner */
+        .ad-banner {
+            width: 100%;
+            height: 90px;
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Calculator View */
+        .calc-view { display: none; animation: fadeIn 0.4s ease; max-width: 900px; margin: 0 auto; }
+        .calc-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        p.desc { color: var(--text-gray); margin-bottom: 2rem; font-size: 1.1rem; }
+
+        /* Grid System */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        
+        /* Inputs */
+        label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Result Box */
+        .result-box {
+            margin-top: 30px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .res-val { font-size: 3rem; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+        .res-lbl { color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-top: 10px; }
+
+        /* Resistor Visual */
+        .resistor-vis {
+            height: 80px; background: #ddd; border-radius: 40px; position: relative;
+            margin: 20px 0; display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.2);
+        }
+        .r-body { width: 260px; height: 100%; background: #f0dec2; border-radius: 12px; display: flex; justify-content: space-evenly; position: relative; z-index: 2; overflow: hidden; }
+        .r-wire { width: 100%; height: 10px; background: #999; position: absolute; z-index: 1; }
+        .band { width: 20px; height: 100%; }
+        
+        /* Utility Colors */
+        .bg-blk { background: #000; } .bg-brn { background: #5e3b18; } .bg-red { background: #d32f2f; }
+        .bg-org { background: #ed6c02; } .bg-yel { background: #fdd835; } .bg-grn { background: #2e7d32; }
+        .bg-blu { background: #1565c0; } .bg-vio { background: #7b1fa2; } .bg-gry { background: #757575; }
+        .bg-wht { background: #fff; } .bg-gld { background: gold; } .bg-sil { background: silver; }
+
+        /* About Section Styles */
+        .about-section {
+            max-width: 900px;
+            margin: 4rem auto 2rem auto;
+            padding: 2rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .about-section h2 { color: var(--primary); margin-bottom: 1rem; font-size: 1.8rem; }
+        .about-section h3 { color: var(--text); margin-top: 1.5rem; margin-bottom: 0.8rem; font-size: 1.2rem; }
+        .about-section p { color: var(--text-gray); line-height: 1.6; margin-bottom: 1rem; }
+        .about-section ul { list-style: none; margin-bottom: 1.5rem; }
+        .about-section li { color: var(--text-gray); margin-bottom: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--accent); }
+        .about-section strong { color: var(--text); }
+
+        /* Responsive */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; }
+            aside { width: 100%; height: auto; border-bottom: 1px solid var(--border); border-right: none; }
+            .menu { display: flex; overflow-x: auto; padding: 10px; gap: 10px; }
+            .menu button { width: auto; white-space: nowrap; margin: 0; }
+            .brand, .sidebar-footer { display: none; }
+            main { padding: 1.5rem; }
+            /* Show footer in main on mobile? Optional, but keeping simple for now to avoid clutter */
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="brand">ElectroCalc<span style="color:var(--primary)">.xyz</span></div>
+        <div class="menu">
+            <button class="active" onclick="tab('ohm', this)">⚡ Ohm's Law</button>
+            <button onclick="tab('res', this)">🎨 Resistor Colors</button>
+            <button onclick="tab('cap', this)">🧊 Capacitor Code</button>
+            <button onclick="tab('div', this)">➗ Voltage Divider</button>
+            <button onclick="tab('led', this)">💡 LED Resistor</button>
+            <button onclick="tab('timer', this)">⏱️ 555 Timer</button>
+            <button onclick="tab('pcb', this)">🛣️ PCB Trace Width</button>
+            <button onclick="tab('serpar', this)">⛓️ Series/Parallel R</button>
+            <button onclick="tab('bat', this)">🔋 Battery Life</button>
+            <button onclick="tab('freq', this)">〰️ Freq ↔ Period</button>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="https://ko-fi.com/electrocalc" target="_blank" class="donate-btn">☕ Buy me a Coffee</a>
+            
+            <div class="ukraine-badge">
+                Made with ❤️ in Ukraine 🇺🇦<br>
+                <a href="https://electro-calc.biz.ua" target="_blank">🔗 electro-calc.biz.ua</a>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <div class="ad-banner">Google AdSense Area (Responsive)</div>
+
+        <div id="ohm" class="calc-view active">
+            <h2>Ohm's Law Calculator</h2>
+            <p class="desc">Instantly calculate Voltage, Current, Resistance, or Power.</p>
+            <div class="grid">
+                <div><label>Voltage (V)</label><input type="number" id="o-v" oninput="cOhm()"></div>
+                <div><label>Current (I)</label><input type="number" id="o-i" oninput="cOhm()"></div>
+                <div><label>Resistance (R)</label><input type="number" id="o-r" oninput="cOhm()"></div>
+                <div><label>Power (P)</label><input type="number" id="o-p" oninput="cOhm()"></div>
+            </div>
+            <div class="result-box"><div class="res-val" id="o-res">---</div><div class="res-lbl">Result</div></div>
+
+            <div style="margin-top: 3rem; color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                <h3 style="color: var(--text); margin-bottom: 0.5rem;">How to use Ohm's Law?</h3>
+                <p style="margin-bottom: 1rem;">Ohm's Law is the foundation of electronics. It states that the current flowing through a conductor is directly proportional to the voltage applied across it. The formula is: <strong>V = I × R</strong>.</p>
+                <ul style="padding-left: 1.2rem; list-style: disc;">
+                    <li><strong>V</strong> = Voltage in Volts (V)</li>
+                    <li><strong>I</strong> = Current in Amperes (A)</li>
+                    <li><strong>R</strong> = Resistance in Ohms (Ω)</li>
+                    <li><strong>P</strong> = Power in Watts (W) (P = V × I)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="res" class="calc-view">
+            <h2>Resistor Color Code</h2>
+            <p class="desc">4-Band resistor visual decoder.</p>
+            <div class="resistor-vis">
+                <div class="r-wire"></div>
+                <div class="r-body">
+                    <div class="band bg-brn" id="b1"></div>
+                    <div class="band bg-blk" id="b2"></div>
+                    <div class="band bg-red" id="b3"></div>
+                    <div class="band bg-gld" id="b4"></div>
+                </div>
+            </div>
+            <div class="grid">
+                <select id="r-1" onchange="cRes()"></select>
+                <select id="r-2" onchange="cRes()"></select>
+                <select id="r-3" onchange="cRes()"></select>
+                <select id="r-4" onchange="cRes()">
+                    <option value="5" class="bg-gld">Gold 5%</option>
+                    <option value="10" class="bg-sil">Silver 10%</option>
+                </select>
+            </div>
+            <div class="result-box"><div class="res-val" id="r-val">1 kΩ</div><div class="res-lbl">Resistance</div></div>
+        </div>
+
+        <div id="cap" class="calc-view">
+            <h2>Capacitor Code</h2>
+            <p class="desc">Convert codes like "104" or "473" to standard units.</p>
+            <div class="grid">
+                <div><label>Code (e.g. 104)</label><input type="number" id="cap-c" placeholder="104" oninput="cCap()"></div>
+            </div>
+            <div class="result-box">
+                <div class="res-val" id="cap-res">---</div>
+                <div class="res-lbl" id="cap-res2">pF / nF / µF</div>
+            </div>
+        </div>
+
+        <div id="div" class="calc-view">
+            <h2>Voltage Divider</h2>
+            <div class="grid">
+                <div><label>Input Voltage (Vin)</label><input type="number" id="d-vin" oninput="cDiv()"></div>
+            </div>
+            <div class="grid">
+                <div><label>R1 (Ohms)</label><input type="number" id="d-r1" oninput="cDiv()"></div>
+                <div><label>R2 (Ohms)</label><input type="number" id="d-r2" oninput="cDiv()"></div>
+            </div>
+            <div class="result-box"><div class="res-val" id="d-res">0.0 V</div><div class="res-lbl">Vout</div></div>
+        </div>
+
+        <div id="led" class="calc-view">
+            <h2>LED Resistor Calculator</h2>
+            <p class="desc">Find the perfect resistor for your LED to prevent burning out.</p>
+            <div class="grid">
+                <div><label>Source Voltage (Vs)</label><input type="number" id="l-vs" oninput="cLed()"></div>
+                <div>
+                    <label>LED Color</label>
+                    <select id="l-vf" onchange="cLed()">
+                        <option value="2.0">Red (2.0V)</option>
+                        <option value="2.1">Green (2.1V)</option>
+                        <option value="3.1">Blue/White (3.1V)</option>
+                    </select>
+                </div>
+                <div><label>Current (mA)</label><input type="number" id="l-i" value="20" oninput="cLed()"></div>
+            </div>
+            <div class="result-box"><div class="res-val" id="l-res">---</div><div class="res-lbl">Resistor Value</div></div>
+            <div style="margin-top: 3rem; color: var(--text-gray); font-size: 0.95rem; line-height: 1.6;">
+                <h3 style="color: var(--text); margin-bottom: 0.5rem;">Why do LEDs need a resistor?</h3>
+                <p>An LED (Light Emitting Diode) is a current-driven device. Without a resistor, an LED will draw as much current as possible until it destroys itself. The resistor limits this current to a safe level.</p>
+                <p style="margin-top: 10px;"><strong>Formula used:</strong> R = (Vs - Vf) / I</p>
+            </div>
+        </div>
+
+        <div id="timer" class="calc-view">
+            <h2>555 Timer (Astable)</h2>
+            <p class="desc">Calculate frequency for Astable mode.</p>
+            <div class="grid">
+                <div><label>R1 (Ohms)</label><input type="number" id="t-r1" placeholder="1000" oninput="c555()"></div>
+                <div><label>R2 (Ohms)</label><input type="number" id="t-r2" placeholder="10000" oninput="c555()"></div>
+                <div><label>Capacitor (µF)</label><input type="number" id="t-c" placeholder="10" oninput="c555()"></div>
+            </div>
+            <div class="result-box">
+                <div class="res-val" id="t-res">0 Hz</div>
+                <div class="res-lbl">Frequency</div>
+            </div>
+        </div>
+
+        <div id="pcb" class="calc-view">
+            <h2>PCB Trace Width</h2>
+            <p class="desc">IPC-2221 Generic Standard (External Layers).</p>
+            <div class="grid">
+                <div><label>Current (Amps)</label><input type="number" id="p-i" value="1" oninput="cPcb()"></div>
+                <div><label>Temp Rise (°C)</label><input type="number" id="p-t" value="10" oninput="cPcb()"></div>
+            </div>
+            <div class="result-box">
+                <div class="res-val" id="p-res">---</div>
+                <div class="res-lbl">Required Width (mil / mm)</div>
+            </div>
+        </div>
+
+        <div id="serpar" class="calc-view">
+            <h2>Series & Parallel Resistors</h2>
+            <p class="desc">Enter 2 resistor values.</p>
+            <div class="grid">
+                <div><label>R1 (Ω)</label><input type="number" id="sp-r1" oninput="cSerPar()"></div>
+                <div><label>R2 (Ω)</label><input type="number" id="sp-r2" oninput="cSerPar()"></div>
+            </div>
+            <div class="grid">
+                <div class="result-box" style="margin-top:0">
+                    <div class="res-val" style="font-size:2rem" id="res-ser">---</div>
+                    <div class="res-lbl">In Series</div>
+                </div>
+                <div class="result-box" style="margin-top:0">
+                    <div class="res-val" style="font-size:2rem" id="res-par">---</div>
+                    <div class="res-lbl">In Parallel</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bat" class="calc-view">
+            <h2>Battery Life</h2>
+            <div class="grid">
+                <div><label>Capacity (mAh)</label><input type="number" id="b-cap" oninput="cBat()"></div>
+                <div><label>Load (mA)</label><input type="number" id="b-load" oninput="cBat()"></div>
+            </div>
+            <div class="result-box"><div class="res-val" id="b-res">---</div><div class="res-lbl">Estimated Hours</div></div>
+        </div>
+
+        <div id="freq" class="calc-view">
+            <h2>Frequency ↔ Period</h2>
+            <div class="grid">
+                <div><label>Freq (Hz)</label><input type="number" id="f-hz" oninput="cFreq('hz')"></div>
+                <div><label>Period (ms)</label><input type="number" id="f-ms" oninput="cFreq('ms')"></div>
+            </div>
+            <div class="result-box"><div class="res-val" id="f-res">---</div><div class="res-lbl">Converted</div></div>
+        </div>
+
+        <section class="about-section">
+            <h2>About Electro-Station</h2>
+            <p>Welcome to <strong>Electro-Station</strong> — your ultimate toolkit for electrical engineering calculations.</p>
+            <p>We created this platform to make complex electronics math accessible for everyone. This project is proudly developed in <strong>Ukraine 🇺🇦</strong>.</p>
+            
+            <h3>Why use our tools?</h3>
+            <ul>
+                <li><strong>Precision:</strong> Verified standard engineering formulas.</li>
+                <li><strong>Speed:</strong> Instant results without page reloads.</li>
+            </ul>
+            
+            <p>Check out our mirror site: <a href="https://electro-calc.biz.ua" target="_blank" style="color:var(--primary)">electro-calc.biz.ua</a></p>
+            <p style="font-size: 0.9rem; margin-top: 2rem; opacity: 0.6;">&copy; 2025 Electro-Station. Made in Ukraine.</p>
+        </section>
+
+    </main>
+
+    <script>
+        // Nav Logic
+        function tab(id, btn) {
+            document.querySelectorAll('.calc-view').forEach(e => e.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        // 1. Ohm
+        function cOhm() {
+            let v = parseFloat(document.getElementById('o-v').value);
+            let i = parseFloat(document.getElementById('o-i').value);
+            let r = parseFloat(document.getElementById('o-r').value);
+            let p = parseFloat(document.getElementById('o-p').value);
+            let res = document.getElementById('o-res');
+
+            if(v && r) res.innerText = (v/r).toFixed(2) + " A";
+            else if(v && i) res.innerText = (v/i).toFixed(2) + " Ω";
+            else if(i && r) res.innerText = (i*r).toFixed(2) + " V";
+            else if(p && v) res.innerText = (p/v).toFixed(2) + " A";
+            else res.innerText = "---";
+        }
+
+        // 2. Resistor
+        const cols = ['black','brown','red','orange','yellow','green','blue','violet','gray','white'];
+        const mults = [1,10,100,1000,10000,100000,1000000,10000000,0.1,0.01];
+        
+        const s1 = document.getElementById('r-1');
+        const s2 = document.getElementById('r-2');
+        const s3 = document.getElementById('r-3');
+
+        cols.forEach((c,i) => {
+            if(i>0) s1.innerHTML += `<option value="${i}" class="bg-${c}">${c}</option>`;
+            s2.innerHTML += `<option value="${i}" class="bg-${c}">${c}</option>`;
+            if(i<8) s3.innerHTML += `<option value="${mults[i]}" class="bg-${c}">${c}</option>`;
+        });
+        s3.innerHTML += `<option value="0.1" class="bg-gld">Gold</option><option value="0.01" class="bg-sil">Silver</option>`;
+
+        function cRes() {
+            let d1 = parseInt(s1.value)||1, d2 = parseInt(s2.value)||0, m = parseFloat(s3.value)||1;
+            
+            // Visual
+            document.getElementById('b1').className = `band bg-${cols[d1]}`;
+            document.getElementById('b2').className = `band bg-${cols[d2]}`;
+            let mCls = m<1 ? (m==0.1 ? 'bg-gld':'bg-sil') : `bg-${cols[Math.log10(m)]}`;
+            document.getElementById('b3').className = `band ${mCls}`;
+            
+            let val = (d1*10+d2)*m;
+            let txt = val + " Ω";
+            if(val>=1000) txt=(val/1000)+" kΩ";
+            if(val>=1000000) txt=(val/1000000)+" MΩ";
+            document.getElementById('r-val').innerText = txt;
+        }
+        setTimeout(cRes, 100);
+
+        // 3. Capacitor
+        function cCap() {
+            let c = document.getElementById('cap-c').value;
+            if(c.length === 3) {
+                let val = parseInt(c.substring(0,2));
+                let mult = parseInt(c.substring(2));
+                let pf = val * Math.pow(10, mult);
+                let nf = pf/1000;
+                let uf = nf/1000;
+                document.getElementById('cap-res').innerText = nf + " nF";
+                document.getElementById('cap-res2').innerText = `${pf}pF / ${uf}µF`;
+            }
+        }
+
+        // 4. Divider
+        function cDiv() {
+            let vin = parseFloat(document.getElementById('d-vin').value);
+            let r1 = parseFloat(document.getElementById('d-r1').value);
+            let r2 = parseFloat(document.getElementById('d-r2').value);
+            if(vin && r1 && r2) document.getElementById('d-res').innerText = (vin * (r2/(r1+r2))).toFixed(2) + " V";
+        }
+
+        // 5. LED
+        function cLed() {
+            let vs = parseFloat(document.getElementById('l-vs').value);
+            let vf = parseFloat(document.getElementById('l-vf').value);
+            let i = parseFloat(document.getElementById('l-i').value)/1000;
+            if(vs && vf && i) document.getElementById('l-res').innerText = Math.round((vs-vf)/i) + " Ω";
+        }
+
+        // 6. 555 Timer
+        function c555() {
+            let r1 = parseFloat(document.getElementById('t-r1').value);
+            let r2 = parseFloat(document.getElementById('t-r2').value);
+            let c = parseFloat(document.getElementById('t-c').value) / 1000000;
+            if(r1 && r2 && c) {
+                let f = 1.44 / ((r1 + 2*r2) * c);
+                document.getElementById('t-res').innerText = f.toFixed(1) + " Hz";
+            }
+        }
+
+        // 7. PCB
+        function cPcb() {
+            let i = parseFloat(document.getElementById('p-i').value);
+            let t = parseFloat(document.getElementById('p-t').value);
+            if(i && t) {
+                let area = Math.pow( (i / (0.048 * Math.pow(t, 0.44))), (1/0.725) );
+                let widthMils = area / 1.378; 
+                let widthMm = widthMils * 0.0254;
+                document.getElementById('p-res').innerText = `${widthMils.toFixed(1)} mil / ${widthMm.toFixed(2)} mm`;
+            }
+        }
+
+        // 8. Series/Parallel
+        function cSerPar() {
+            let r1 = parseFloat(document.getElementById('sp-r1').value);
+            let r2 = parseFloat(document.getElementById('sp-r2').value);
+            if(r1 && r2) {
+                document.getElementById('res-ser').innerText = (r1+r2).toFixed(1) + " Ω";
+                document.getElementById('res-par').innerText = ((r1*r2)/(r1+r2)).toFixed(1) + " Ω";
+            }
+        }
+
+        // 9. Battery
+        function cBat() {
+            let c = parseFloat(document.getElementById('b-cap').value);
+            let l = parseFloat(document.getElementById('b-load').value);
+            if(c && l) document.getElementById('b-res').innerText = ((c/l)*0.7).toFixed(1) + " Hrs";
+        }
+
+        // 10. Freq
+        function cFreq(m) {
+            let v = parseFloat(document.getElementById(m=='hz'?'f-hz':'f-ms').value);
+            if(v) document.getElementById('f-res').innerText = (1000/v).toFixed(2) + (m=='hz'?" ms":" Hz");
+        }
+    </script>
+</body>
+</html>
