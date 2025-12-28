@@ -219,6 +219,15 @@
         .about-section li { color: var(--text-gray); margin-bottom: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--accent); }
         .about-section strong { color: var(--text); }
 
+        /* NEW: Mobile Footer Styles */
+        .mobile-footer {
+            display: none; /* Hidden on desktop */
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
         /* Responsive */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
@@ -227,7 +236,9 @@
             .menu button { width: auto; white-space: nowrap; margin: 0; }
             .brand, .sidebar-footer { display: none; }
             main { padding: 1.5rem; }
-            /* Show footer in main on mobile? Optional, but keeping simple for now to avoid clutter */
+            
+            /* Show footer only on mobile */
+            .mobile-footer { display: block; }
         }
     </style>
 </head>
@@ -433,6 +444,14 @@
             <p>Check out our mirror site: <a href="https://electro-calc.biz.ua" target="_blank" style="color:var(--primary)">electro-calc.biz.ua</a></p>
             <p style="font-size: 0.9rem; margin-top: 2rem; opacity: 0.6;">&copy; 2025 Electro-Station. Made in Ukraine.</p>
         </section>
+
+        <div class="mobile-footer">
+            <a href="https://ko-fi.com/electrocalc" target="_blank" class="donate-btn">☕ Buy me a Coffee</a>
+            <div class="ukraine-badge">
+                Made with ❤️ in Ukraine 🇺🇦<br>
+                <a href="https://electro-calc.biz.ua" target="_blank">🔗 electro-calc.biz.ua</a>
+            </div>
+        </div>
 
     </main>
 
